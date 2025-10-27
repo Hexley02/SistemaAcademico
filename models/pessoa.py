@@ -1,7 +1,7 @@
 import datetime
 
 class Pessoa:
-    def __init__(self, nome:str, email:str, data_nascimento:datetime, telefone:str , endereco):
+    def __init__(self, nome:str, email:str, data_nascimento:datetime, telefone:str , endereco:str):
         self.__nome = nome 
         self.__email = email
         self.__data_nascimento = data_nascimento
@@ -24,10 +24,19 @@ class Pessoa:
         return self.__endereco
     
 #setters  
-    def set_email(self, email):
-        self.__email = email 
-        
+    def set_email(self, email: str):
+        if "@" in email:
+            self.__email = email
+        else:
+            print(" Email inválido!")
+      
 #metódos 
+
+    def _calcular_idade(self) -> int:
+        hoje = datetime.date.today()
+        nascimento = self.__data_nascimento
+        idade = hoje.year - nascimento.year - ((hoje.month, hoje.day) < (nascimento.month, nascimento.day))
+        return idade
 
     def exibir_detalhes(self) -> str:
         nome = self.__nome
