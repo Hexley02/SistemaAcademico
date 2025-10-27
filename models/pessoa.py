@@ -29,25 +29,7 @@ class Pessoa:
         
 #metódos 
 
-    def _calcular_idade(self) -> int:
-        """Retorna a idade em anos com base em self.__data_nascimento."""
-        today = datetime.date.today()
-        dob = self.__data_nascimento
-        # aceitar datetime ou date
-        if isinstance(dob, datetime.datetime):
-            dob = dob.date()
-        try:
-            idade = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
-        except Exception:
-            # se data inválida, retorna 0
-            idade = 0
-        return idade
-
     def exibir_detalhes(self) -> str:
-        """Retorna uma string com os detalhes da pessoa formatados.
-
-        Campos incluídos: Nome, Email, Data de nascimento (dd/mm/aaaa), Idade, Telefone, Endereço.
-        """
         nome = self.__nome
         email = self.__email
         data = self.__data_nascimento
