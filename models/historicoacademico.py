@@ -1,83 +1,76 @@
 import datetime
 from matricula import Matricula
 from disciplina import Disciplina
-from matriculapagadisciplina import MatriculaPagaDisciplina  
+from matriculapagadisciplina import MatriculaPagaDisciplina 
+from typing import List
 
 class HistoricoAcademico:
     
-    def __init__(self, matricula: "Matricula", data: datetime.date, disciplinas: list, 
-                 carga_horaria: float, quantidade_creditos: int, matricula_pd: list = None):
+    def __init__(self, matricula_aluno: 'Matricula', data_emissao: datetime.date, 
+                quantidade_creditos: int,
+                 registros_disciplinas: List['MatriculaPagaDisciplina'] = None
+                ):
         
-        self.__matricula = matricula
-        self.__data = data
-        self.__disciplinas = disciplinas if disciplinas is not None else [] 
-        self.__carga_horaria = carga_horaria
+       
+        self.__matricula_aluno = matricula_aluno
+        self.__data_emissao = data_emissao
+        self.__registros_disciplinas = registros_disciplinas if registros_disciplinas is not None else []
         self.__quantidade_creditos = quantidade_creditos
-        self.__matricula_pd = matricula_pd if matricula_pd is not None else []
+       
+        
 
-    #Getters 
-    
-    def get_matricula(self) -> 'Matricula':
-        return self.__matricula
+# Getters 
 
-    def get_data(self) -> datetime.date:
-        return self.__data
+    def get_matricula_aluno(self) -> 'Matricula':
+        return self.__matricula_aluno
     
-    def get_disciplinas(self) -> list:
-        return self.__disciplinas
+    def get_data_emissao(self) -> datetime.date:
+        return self.__data_emissao
     
-    def get_carga_horaria(self) -> float:
-        return self.__carga_horaria
+    def get_registros_disciplinas(self) -> List['MatriculaPagaDisciplina']:
+        return self.__registros_disciplinas
     
     def get_quantidade_creditos(self) -> int:
         return self.__quantidade_creditos
     
-    def get_matricula_pd(self) -> list:
-        return self.__matricula_pd
-    
+# Métodos
    
-    #métodos
+    def calcular_ira(self) -> float:
+        """ Calcula o Índice de Rendimento Acadêmico (IRA).
     
+        """
+        if not self.__registros_disciplinas:
+            return 0.0
+        
+        total_pontos = 0
+        total_creditos = 0
+        
+        for registro in self.__registros_disciplinas:
+            if hasattr(registro, 'get_media_final') and hasattr(registro, 'get_creditos_disciplina'):
+                media = registro.get_media_final()
+                creditos = registro.get_creditos_disciplina() 
+                
+                total_pontos += (media * creditos)
+                total_creditos += creditos
+        
+        ira = total_pontos / total_creditos if total_creditos > 0 else 0.0
+        return ira
+
     def exibir_historico(self):
+       
+        ira_atual = self.calcular_ira()
         
-        # Acessa um ID do objeto Matrícula, assumindo que ele tenha um método get_id()
-        matricula_ref = self.__matricula.get_id() if hasattr(self.__matricula, 'get_id') else "Objeto Matrícula não inicializado"
+        print(f"\n===== HISTÓRICO ACADÊMICO ({self.__data_emissao.strftime('%d/%m/%Y')}) =====")
+        print(f"Referência Matrícula: {self.__matricula_aluno.get_id()}")
+        print(f"Quantidade de Créditos: {self.__quantidade_creditos}")
+        print(f"IRA/CR Atual: **{ira_atual:.2f}**")
+        print(f"Total de Registros de Disciplinas: {len(self.__registros_disciplinas)}")
         
-        # Cria a lista de nomes das disciplinas inscritas
-        disciplinas_nomes = [d.get_nome() for d in self.__disciplinas if hasattr(d, 'get_nome')]
-        disciplinas_str = ', '.join(disciplinas_nomes) if disciplinas_nomes else "Nenhuma disciplina"
+    
         
-        print(f"\n--- Histórico de Inscrição ---")
-        print(f"Referência Matrícula: **{matricula_ref}**")
-        print(f"Data de Inscrição: {self.__data.strftime('%d/%m/%Y')}")
-        print(f"Carga Horária Total: {self.__carga_horaria:.1f}h")
-        print(f"Créditos Totais: {self.__quantidade_creditos}")
-        print(f"Disciplinas Inscritas ({len(self.__disciplinas)}): {disciplinas_str}")
-        print(f"Registros Detalhados (MatriculaPD): {len(self.__matricula_pd)} itens")
-        print("------------------------------\n")
-
-
-    def adicionar_disciplina_e_registro(self, disciplina: 'Disciplina', registro_pd: 'MatriculaPagaDisciplina'):
-        """
-        Método 2: Adiciona uma nova disciplina e seu registro detalhado de MatrículaPagaDisciplina.
-        Atualiza a carga horária e os créditos totais agregados.
-        """
-        
-        # 1. Adiciona a disciplina e atualiza os totais
-        if disciplina not in self.__disciplinas:
-            self.__disciplinas.append(disciplina)
-            
-            # Tenta atualizar os totais: verifica se a Disciplina tem os getters
-            if hasattr(disciplina, 'get_carga_horaria'):
-                self.__carga_horaria += disciplina.get_carga_horaria()
-            if hasattr(disciplina, 'get_creditos'):
-                self.__quantidade_creditos += disciplina.get_creditos()
-            
-            nome_disc = disciplina.get_nome() if hasattr(disciplina, 'get_nome') else 'Nova'
-            print(f"Disciplina '{nome_disc}' adicionada. Totais atualizados.")
-        else:
-            print(f"Disciplina já está inscrita neste Histórico.")
-        
-        # 2. Adiciona o registro detalhado
-        self.__matricula_pd.append(registro_pd)
-        print("Registro detalhado (MatriculaPD) adicionado.")
+        # Exibe cada registro detalhado (exemplo)
+        for i, registro in enumerate(self.__registros_disciplinas):
+            disc_nome = registro.get_disciplina().get_nome() if hasattr(registro, 'get_disciplina') else "N/A"
+            media = registro.get_media_final() if hasattr(registro, 'get_media_final') else "N/A"
+            print(f"Registro {i+1}: {disc_nome} (Média: {media})")
+  

@@ -50,7 +50,6 @@ class Curso:
         print(f"Duração Total: {self.__periodo} períodos")
         print(f"Avaliação Institucional: {self.__avaliacao_curso:.2f}")
         print(f"Total de Disciplinas na Grade: {disciplinas_count}")
-        print("=============================================\n")
 
     def adicionar_disciplina(self, d: 'Disciplina'):
         

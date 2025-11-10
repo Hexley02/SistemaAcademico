@@ -1,28 +1,33 @@
 import os
 import sys
 from persistence.gerenciador_arquivos import GerenciadorArquivos
+from aluno import Aluno
+from professor import Professor
+from curso import Curso
+from disciplina import Disciplina
 
 
-# adiciona a pasta raiz do projeto ao caminho do Python
+# Adiciona a pasta raiz do projeto ao caminho do Python
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 class SistemaAcademico:
-    def __init__(self,alunos:list = None ,professores:list = None, cursos:list = None , disciplinas:list = None , arquivos_dados:dict = None):
+    
+    def __init__(self, alunos: list = None, professores: list = None, cursos: list = None, 
+                 disciplinas: list = None, arquivos_dados: dict = None):
+        
         self.__alunos = alunos if alunos is not None else []
         self.__professores = professores if professores is not None else []
         self.__cursos = cursos if cursos is not None else []
         self.__disciplinas = disciplinas if disciplinas is not None else []
+        self.__arquivos_dados = arquivos_dados if arquivos_dados is not None else {}
       
-
-    
     #getters 
-
     def get_alunos(self) -> list:
-        return self.__alunos    
+        return self.__alunos 
     
     def get_professores(self) -> list:
-        return self.__professores
-    
+        return self.__professores   
+        
     def get_cursos(self) -> list:
         return self.__cursos
     
@@ -40,7 +45,6 @@ class SistemaAcademico:
             'professores': self.__professores,
             'cursos': self.__cursos,
             'disciplinas': self.__disciplinas
-
         }
 
         gerenciador = GerenciadorArquivos(self.__arquivos_dados)
@@ -49,7 +53,8 @@ class SistemaAcademico:
             gerenciador.salvar(dados)
             print("Dados salvo com sucesso!")
         except Exception as e:
-            print("Erro ao salvar dados: {e}")
+            # CORREÇÃO: Uso correto do f-string no erro
+            print(f"Erro ao salvar dados: {e}")
 
     def carregar_dados(self):
         gerenciador = GerenciadorArquivos(self.__arquivos_dados)
@@ -61,6 +66,7 @@ class SistemaAcademico:
                 self.__professores = dados.get('professores', [])
                 self.__cursos = dados.get('cursos', [])
                 self.__disciplinas = dados.get('disciplinas', [])
+                print("Dados carregados com sucesso!")
             else:
                 print("Nenhum dado encontrado para carregar. Inicializando com listas vazias.")
                 self.__alunos = []
@@ -79,8 +85,3 @@ class SistemaAcademico:
             self.__professores = []
             self.__cursos = []
             self.__disciplinas = []
-
-    
-    
-
-    

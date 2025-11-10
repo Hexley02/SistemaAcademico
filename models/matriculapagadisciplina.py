@@ -1,46 +1,60 @@
-import datetime
+from disciplina import Disciplina
+from matricula import Matricula
+from historicoacademico import HistoricoAcademico
+from typing import List
+
 
 class MatriculaPagaDisciplina:
-    def __init__(self, aluno, disciplina, data_matricula:datetime.date, valor:float, status:str):
-        self.__aluno = aluno
+    def __init__(self, matricula: "Matricula", disciplina: "Disciplina", notas: List[float], faltas: int,
+                  historico_acad: 'HistoricoAcademico' = None):
+        
+        self.__matricula = matricula
         self.__disciplina = disciplina
-        self.__data_matricula = data_matricula
-        self.__valor = valor
-        self.__status = status
+        self.__notas = notas
+        self.__faltas = faltas
+        self.__media_final = self.calcular_media_final() 
+        self.__historico_acad = historico_acad
+        
 
-#getters
-    def get_aluno(self):
-        return self.__aluno
-    
-    def get_disciplina(self):
+# getters
+    def get_matricula(self) -> Matricula:
+        return self.__matricula
+
+    def get_disciplina(self) -> Disciplina:
         return self.__disciplina
-    
-    def get_data_matricula(self):
-        return self.__data_matricula
-    
-    def get_valor(self):
-        return self.__valor
-    
-    def get_status(self):
-        return self.__status
 
-#setters
-    def set_status(self, status:str):
-        self.__status = status
+    def get_notas(self) -> List[float]:
+        return self.__notas
 
-    def set_valor(self, valor:float):
-        self.__valor = valor
+    def get_media_final(self) -> float:
+        return self.__media_final
 
-#metódos
-    def exibir_detalhes(self) -> str:
-        nome_aluno = self.__aluno.get_nome() if self.__aluno else "Aluno não definido"
-        nome_disciplina = self.__disciplina.get_nome() if self.__disciplina else "Disciplina não definida"
-        data = self.__data_matricula.strftime('%d/%m/%Y') if hasattr(self.__data_matricula, 'strftime') else str(self.__data_matricula)
-        detalhes = (
-            f"Aluno: {nome_aluno}\n"
-            f"Disciplina: {nome_disciplina}\n"
-            f"Data da matrícula: {data}\n"
-            f"Valor: R${self.__valor:.2f}\n"
-            f"Status: {self.__status}"
-        )
-        return detalhes
+    def get_faltas(self) -> int:
+        return self.__faltas
+    
+    def get_historico_acad(self) -> 'HistoricoAcademico':
+        return self.__historico_acad
+
+    
+# métodos 
+    def calcular_media_final(self) -> float:
+        if not self.__notas:
+            media = 0.0
+        else:
+            media = sum(self.__notas) / len(self.__notas)
+            
+        self.__media_final = media # Atualiza o atributo privado
+        return self.__media_final
+
+    def verificar_faltas(self, max_faltas: int) -> bool:
+        return self.__faltas > max_faltas
+
+    def verificar_aprovacao(self, media_minima: float = 7.0, max_faltas: int = 20) -> str:
+        media = self.get_media_final()
+        
+        if self.verificar_faltas(max_faltas):
+             return "REPROVADO POR FALTA"
+        elif media >= media_minima:
+             return "APROVADO"
+        else:
+             return "REPROVADO POR NOTA"

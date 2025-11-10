@@ -1,10 +1,14 @@
+from aluno import Aluno
+from professor import Professor
+from typing import List
+
 class Disciplina:
-    def __init__(self, codigo:int, nome:str, carga_horaria:int, professor_responsavel, alunos:list):
+    def __init__(self, codigo:int, período:int, nome:str, professor_responsavel: "Professor", alunos:List[Aluno]):
         self.__codigo = codigo
         self.__nome = nome
-        self.__carga_horaria = carga_horaria
+        self.__período = período
         self.__professor_responsavel = professor_responsavel
-        self.__alunos = alunos
+        self.__alunos = alunos if alunos is not None else []
 
 #getters
     def get_codigo(self):
@@ -13,8 +17,8 @@ class Disciplina:
     def get_nome(self):
         return self.__nome
     
-    def get_carga_horaria(self):
-        return self.__carga_horaria
+    def get_período(self):
+        return self.__período
     
     def get_professor_responsavel(self):
         return self.__professor_responsavel
@@ -25,10 +29,7 @@ class Disciplina:
 #setters
     def set_nome(self, nome:str):
         self.__nome = nome
-        
-    def set_carga_horaria(self, carga_horaria:int):
-        self.__carga_horaria = carga_horaria
-        
+         
     def set_professor_responsavel(self, professor):
         self.__professor_responsavel = professor
         
@@ -46,7 +47,7 @@ class Disciplina:
         detalhes = (
             f"Código: {self.__codigo}\n"
             f"Nome: {self.__nome}\n"
-            f"Carga horária: {self.__carga_horaria}h\n"
+            f"Período: {self.__período}\n"
             f"Professor responsável: {professor}\n"
             f"Alunos: {nomes_alunos}"
         )
