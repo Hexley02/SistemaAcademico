@@ -1,40 +1,62 @@
 import datetime
+from aluno import Aluno
+from disciplina import Disciplina
+
 
 class Matricula:
-    def __init__(self, aluno, data_matricula:datetime.date, matriculas_pagas:list):
+    
+    def __init__(self, aluno: 'Aluno', disciplina: 'Disciplina', status: bool, 
+                 semestre: str, data_matricula: datetime.date):
+        
         self.__aluno = aluno
+        self.__disciplina = disciplina
+        self.__status = status
+        self.__semestre = semestre
         self.__data_matricula = data_matricula
-        self.__matriculas_pagas = matriculas_pagas
 
-#getters
-    def get_aluno(self):
+    #Getters 
+    
+    def get_aluno(self) -> 'Aluno':
         return self.__aluno
 
-    def get_data_matricula(self):
+    def get_disciplina(self) -> 'Disciplina':
+        return self.__disciplina
+    
+    def get_status(self) -> bool:
+        return self.__status
+    
+    def get_semestre(self) -> str:
+        return self.__semestre
+    
+    def get_data_matricula(self) -> datetime.date:
         return self.__data_matricula
 
-    def get_matriculas_pagas(self):
-        return self.__matriculas_pagas
+    
+   #metódos
 
-#setters
-    def set_matriculas_pagas(self, matriculas_pagas:list):
-        self.__matriculas_pagas = matriculas_pagas
+    def alterar_matricula(self, novo_status: bool = None):
+        
+        if novo_status is not None:
+            self.set_status(novo_status)
+            status_str = "ATIVA" if novo_status else "TRANCADA/CANCELADA"
+            
+            # Tenta pegar os nomes para uma mensagem informativa
+            aluno_nome = self.__aluno.get_nome() if hasattr(self.__aluno, 'get_nome') else "Aluno"
+            disc_nome = self.__disciplina.get_nome() if hasattr(self.__disciplina, 'get_nome') else "Disciplina"
 
-#metódos
-    def adicionar_matricula_paga(self, matricula_paga):
-        self.__matriculas_pagas.append(matricula_paga)
+            print(f"Matrícula de {aluno_nome} em {disc_nome} alterada para: **{status_str}**.")
 
-    def remover_matricula_paga(self, matricula_paga):
-        if matricula_paga in self.__matriculas_pagas:
-            self.__matriculas_pagas.remove(matricula_paga)
-
-    def exibir_detalhes(self) -> str:
-        nome_aluno = self.__aluno.get_nome() if self.__aluno else "Aluno não definido"
-        data = self.__data_matricula.strftime('%d/%m/%Y') if hasattr(self.__data_matricula, 'strftime') else str(self.__data_matricula)
-        lista_matriculas = ', '.join([m.get_disciplina().get_nome() for m in self.__matriculas_pagas]) if self.__matriculas_pagas else "Nenhuma disciplina"
-        detalhes = (
-            f"Aluno: {nome_aluno}\n"
-            f"Data da matrícula: {data}\n"
-            f"Disciplinas matriculadas: {lista_matriculas}"
-        )
-        return detalhes
+    def carregar_dados(self):
+        # Tenta pegar os nomes para uma mensagem informativa
+        aluno_nome = self.__aluno.get_nome() if hasattr(self.__aluno, 'get_nome') else "Aluno"
+        disc_nome = self.__disciplina.get_nome() if hasattr(self.__disciplina, 'get_nome') else "Disciplina"
+        
+        # Aqui, no código real, você chamaria o GerenciadorArquivos.
+        print(f" Dados da matrícula de {aluno_nome} em {disc_nome} carregados com sucesso!")
+        
+    def __str__(self) -> str:
+        """Retorna uma representação em string concisa do objeto."""
+        aluno_nome = self.__aluno.get_nome() if hasattr(self.__aluno, 'get_nome') else "Aluno Ref"
+        disc_nome = self.__disciplina.get_nome() if hasattr(self.__disciplina, 'get_nome') else "Disciplina Ref"
+        status_str = "Ativa" if self.__status else "Inativa"
+        return f"Matricula({aluno_nome} em {disc_nome} - Semestre: {self.__semestre}, Status: {status_str})"
