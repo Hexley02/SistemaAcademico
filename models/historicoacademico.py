@@ -7,7 +7,7 @@ from typing import List
 class HistoricoAcademico:
     
     def __init__(self, matricula_aluno: 'Matricula', data_emissao: datetime.date, 
-                quantidade_creditos: int,
+                quantidade_creditos: int, lista_atividades_complemetares = [],
                  registros_disciplinas: List['MatriculaPagaDisciplina'] = None
                 ):
         
@@ -16,6 +16,7 @@ class HistoricoAcademico:
         self.__data_emissao = data_emissao
         self.__registros_disciplinas = registros_disciplinas if registros_disciplinas is not None else []
         self.__quantidade_creditos = quantidade_creditos
+        self.__lista_atividades_complementares = lista_atividades_complemetares if lista_atividades_complemetares is not None else []
        
         
 
@@ -33,8 +34,13 @@ class HistoricoAcademico:
     def get_quantidade_creditos(self) -> int:
         return self.__quantidade_creditos
     
+    def get_lista_atividades_complementares(self):
+        return self.__lista_atividades_complementares
+    
 # Métodos
    
+   # método para lista de atividades complementares
+
     def calcular_ira(self) -> float:
         """ Calcula o Índice de Rendimento Acadêmico (IRA).
     
@@ -42,6 +48,7 @@ class HistoricoAcademico:
         if not self.__registros_disciplinas:
             return 0.0
         
+        #exception
         total_pontos = 0
         total_creditos = 0
         

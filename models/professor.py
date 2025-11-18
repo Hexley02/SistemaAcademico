@@ -65,5 +65,12 @@ class Professor(Pessoa):
             f"Título: {self.__titulo}"
         )
         return detalhes_pessoa + detalhes_professor
+    
+    #nos dois recebe o objeto de disciplina
+    def alocar_disciplinas(self):
+        pass
+
+    def remover_disciplinas(self):
+        pass
 
     

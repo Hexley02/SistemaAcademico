@@ -7,7 +7,7 @@ class Curso:
         
         self.__codigo = codigo
         self.__disciplinas = disciplinas if disciplinas is not None else []
-        self.__periodo = periodo 
+        self.__periodo = periodo
         self.__turno = turno
         self.__avaliacao_curso = avaliacao_curso 
         
@@ -37,6 +37,8 @@ class Curso:
 
     def set_avaliacao_curso(self, avaliacao_curso: float):
         self.__avaliacao_curso = avaliacao_curso
+
+    #set periodo
 
     #métodos
     

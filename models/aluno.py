@@ -26,6 +26,8 @@ class Aluno(Pessoa):
     
     def get_creditos_concluidos(self):
         return self.__creditos_concluidos
+    
+    #setter para periodo
 
 
 
