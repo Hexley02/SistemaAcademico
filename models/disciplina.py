@@ -32,6 +32,10 @@ class Disciplina:
          
     def set_professor_responsavel(self, professor):
         self.__professor_responsavel = professor
+
+    def set_periodo(self, período:int):
+        self.__período = período
+
         
 #metódos
     def adicionar_aluno(self, aluno):

@@ -38,8 +38,17 @@ class HistoricoAcademico:
         return self.__lista_atividades_complementares
     
 # Métodos
+
    
    # método para lista de atividades complementares
+
+    def adicionar_atividade_complementar(self, descricao_atividade: str):
+           
+            if not isinstance(descricao_atividade, str) or not descricao_atividade.strip():
+                raise TypeError("A descrição da atividade deve ser uma string não vazia.")
+                
+            self.__lista_atividades_complementares.append(descricao_atividade)
+            print(f"Atividade '{descricao_atividade[:30]}...' adicionada com sucesso.")
 
     def calcular_ira(self) -> float:
         """ Calcula o Índice de Rendimento Acadêmico (IRA).
@@ -74,10 +83,16 @@ class HistoricoAcademico:
         print(f"Total de Registros de Disciplinas: {len(self.__registros_disciplinas)}")
         
     
-        
-        # Exibe cada registro detalhado (exemplo)
+        print("\n--- REGISTROS DE DISCIPLINAS ---")
         for i, registro in enumerate(self.__registros_disciplinas):
             disc_nome = registro.get_disciplina().get_nome() if hasattr(registro, 'get_disciplina') else "N/A"
             media = registro.get_media_final() if hasattr(registro, 'get_media_final') else "N/A"
-            print(f"Registro {i+1}: {disc_nome} (Média: {media})")
-  
+            print(f"Registro {i+1}: {disc_nome} (Média: {media:.2f})")
+            
+    
+        print("\n--- ATIVIDADES COMPLEMENTARES ---")
+        if self.__lista_atividades_complementares:
+            for i, atividade in enumerate(self.__lista_atividades_complementares):
+                print(f"[{i+1}] {atividade}")
+        else:
+            print("Nenhuma atividade complementar registrada.")

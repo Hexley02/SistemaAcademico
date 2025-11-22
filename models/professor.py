@@ -67,10 +67,37 @@ class Professor(Pessoa):
         return detalhes_pessoa + detalhes_professor
     
     #nos dois recebe o objeto de disciplina
-    def alocar_disciplinas(self):
-        pass
+    def alocar_disciplinas(self, disciplina: Disciplina):
 
-    def remover_disciplinas(self):
-        pass
+        try:
+            disc_codigo = disciplina.get_codigo()
+            disc_nome = disciplina.get_nome()
+            
+        except AttributeError:
+            raise TypeError("Erro: O objeto fornecido não é uma Disciplina válida (falta get_codigo()).")
+
+       
+        if disciplina in self.__disciplinas:
+            raise ValueError(f"A Disciplina '{disc_nome}' (Código {disc_codigo}) já está alocada a este professor.")
+        
+        self.__disciplinas.append(disciplina)
+        print(f"Disciplina '{disc_nome}' alocada ao Professor {self.__nome} com sucesso.")
+    
+
+    def remover_disciplinas(self, disciplina: Disciplina):
+
+        try:
+            disc_codigo = disciplina.get_codigo()
+            disc_nome = disciplina.get_nome()   
+
+        except AttributeError:
+            raise TypeError("Erro: O objeto fornecido não é uma Disciplina válida (falta get_codigo()).")
+        
+        if disciplina not in self.__disciplinas:
+            self.__disciplinas.remove(disciplina)
+            print(f"Disciplina '{disc_nome}' removida do Professor {self.__nome} com sucesso.")
+        else:
+            raise ValueError(f"A Disciplina '{disc_nome}' (Código {disc_codigo}) não está alocada a este professor.")
+       
 
     

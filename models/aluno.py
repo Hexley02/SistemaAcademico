@@ -27,7 +27,10 @@ class Aluno(Pessoa):
     def get_creditos_concluidos(self):
         return self.__creditos_concluidos
     
-    #setter para periodo
+    #setter
+    
+    def set_periodo_atual(self, periodo:int):
+        self.__periodo_atual = periodo
 
 
 
