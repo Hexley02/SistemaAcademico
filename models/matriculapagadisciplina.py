@@ -58,3 +58,4 @@ class MatriculaPagaDisciplina:
              return "APROVADO"
         else:
              return "REPROVADO POR NOTA"
+    

@@ -40,48 +40,74 @@ class SistemaAcademico:
 # metódos 
 
     def salvar_dados(self):
-        dados = {
-            'alunos': self.__alunos,
-            'professores': self.__professores,
-            'cursos': self.__cursos,
-            'disciplinas': self.__disciplinas
+        dados_serializados = {
+            'alunos': [serializar_aluno(a) for a in self.__alunos],
+            'professores': [serializar_professor(p) for p in self.__professores],
+            'cursos': [serializar_curso(c) for c in self.__cursos],
+            'disciplinas': [serializar_disciplina(d) for d in self.__disciplinas],
+           
         }
 
         gerenciador = GerenciadorArquivos(self.__arquivos_dados)
         
         try: 
-            gerenciador.salvar(dados)
-            print("Dados salvo com sucesso!")
+            gerenciador.salvar(dados_serializados) 
+            print("Dados salvos e serializados com sucesso!")
         except Exception as e:
-            # CORREÇÃO: Uso correto do f-string no erro
             print(f"Erro ao salvar dados: {e}")
 
     def carregar_dados(self):
-        gerenciador = GerenciadorArquivos(self.__arquivos_dados)
+        def carregar_dados(self):
+            gerenciador = GerenciadorArquivos(self.__arquivos_dados)
+            
+            try:
+                dados_json = gerenciador.carregar()
+                
+                if not dados_json:
+                    print("Nenhum dado encontrado.")
+                    return 
 
-        try:
-            dados = gerenciador.carregar()
-            if dados:
-                self.__alunos = dados.get('alunos', [])
-                self.__professores = dados.get('professores', [])
-                self.__cursos = dados.get('cursos', [])
-                self.__disciplinas = dados.get('disciplinas', [])
-                print("Dados carregados com sucesso!")
-            else:
-                print("Nenhum dado encontrado para carregar. Inicializando com listas vazias.")
-                self.__alunos = []
-                self.__professores = []
-                self.__cursos = []
-                self.__disciplinas = []
-        except FileNotFoundError:
-            print("Arquivo de dados não encontrado. Inicializando com listas vazias.")
+                print("Dados JSON carregados. Iniciando desserialização...")
+
+                # 1. DESSERIALIZAÇÃO INICIAL (cria objetos SEM associações)
+                # A ordem é importante: carregar primeiro quem é referenciado
+                
+                self.__disciplinas = [desserializar_disciplina(d) for d in dados_json.get('disciplinas', [])]
+                self.__professores = [desserializar_professor(p) for p in dados_json.get('professores', [])]
+                self.__cursos = [desserializar_curso(c) for c in dados_json.get('cursos', [])]
+                self.alunos = [desserializar_aluno(a) for a in dados_json.get('alunos', [])]
+                # ... desserializar as demais classes (Matricula, Historico, MPD)
+
+                # 2. RECONSTRUÇÃO DAS ASSOCIAÇÕES (O passo mais importante)
+                # Você precisa de métodos de busca no SistemaAcademico para encontrar objetos por ID.
+                # Exemplo: Reconstruindo a associação Professor-Disciplina
+                self.reconstruir_associacoes() # Chamamos um novo método para isso.
+                
+                print("Dados carregados e objetos reconstruídos com sucesso!")
+                
+            except FileNotFoundError:
+                print("Arquivo de dados não encontrado. Inicializando com listas vazias.")
+                self.inicializar_vazio()
+            except Exception as e:
+                print(f"Erro ao carregar/desserializar dados: {e}. Inicializando vazio.")
+                self.inicializar_vazio()
+
+        def inicializar_vazio(self):
             self.__alunos = []
             self.__professores = []
             self.__cursos = []
             self.__disciplinas = []
-        except Exception as e:
-            print(f"Erro ao carregar dados: {e}. Inicializando com listas vazias.")
-            self.__alunos = []
-            self.__professores = []
-            self.__cursos = []
-            self.__disciplinas = []
+
+        
+        # Você precisará de métodos de busca como este:
+        def buscar_professor_por_codigo(self, codigo):
+            for p in self.__professores:
+                if p.get_codigo() == codigo:
+                    return p
+            return None
+            
+        def buscar_curso_por_codigo(self, codigo):
+            for c in self.__cursos:
+                if c.get_codigo() == codigo:
+                    return c
+            return None
