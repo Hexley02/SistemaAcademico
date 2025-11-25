@@ -58,4 +58,11 @@ class MatriculaPagaDisciplina:
              return "APROVADO"
         else:
              return "REPROVADO POR NOTA"
-    
+        
+#média minima para a final. se for menor reprova por nota se maior vai para fnal (média =nota final)\ 2 = 7) caso não = reprovado por nota
+"""
+inclusive outras situações para verificar a final se quiser ver se o caba é laureavél também tá ligado 
+
+USAR O RICH, BAIXANDO NO AMBIENTE VIRTUAL DO TERMINAL MESMO PARA DEIXAR BONITÃO
+
+"""

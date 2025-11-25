@@ -29,6 +29,11 @@ class Pessoa:
             self.__email = email
         else:
             print(" Email inválido!")
+    """
+    criar outras limitações e verificações para email. usando except
+    
+    
+    """
       
 #metódos 
 

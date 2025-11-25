@@ -10,7 +10,7 @@ from models.pessoa import Pessoa
 from models.historicoacademico import HistoricoAcademico
 from typing import Dict, Any, List
 
-
+#curso codigo e dicisplinas codigos não está declarado em local nenhum.
 def desserializar_aluno(dados_json: dict) -> Aluno:
     dados_pessoa = desserializar_pessoa(dados_json) 
     
