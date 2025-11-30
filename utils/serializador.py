@@ -65,7 +65,7 @@ def serealizar_disciplina(disciplina: Disciplina) -> dict:
         "alunos_matriculas": alunos_matriculas
     }
 
-def serializar_historico_academico(historico: HistoricoAcademico) -> dict:
+def serializar_historico(historico: HistoricoAcademico) -> dict:
     data_emissao_str = historico.get_data_emissao().isoformat()
     matricula_obj = historico.get_matricula_aluno()
     matricula_id = matricula_obj.get_id_matricula() if hasattr(matricula_obj, 'get_id_matricula') else matricula_obj.get_matricula()
@@ -95,8 +95,7 @@ def serializar_matricula(matricula: Matricula) -> dict:
     for registro in matricula.get_registros_disciplinas():
         if hasattr(registro, 'to_dict'):
             registros_serializados.append(registro.to_dict())
-        # else:
-            # registros_serializados.append(serializar_matricula_paga_disciplina(registro)) 
+        
     return {
         'id_matricula': matricula.get_id_matricula(),
         'status': matricula.get_status(),
@@ -106,6 +105,7 @@ def serializar_matricula(matricula: Matricula) -> dict:
     }
 
 def serializar_matricula_paga_disciplina(mpd: MatriculaPagaDisciplina) -> dict:
+    id_mpd =id(mpd)
    
     matricula_obj = mpd.get_matricula()
     matricula_id = matricula_obj.get_id_matricula() if hasattr(matricula_obj, 'get_id_matricula') else None
@@ -118,12 +118,14 @@ def serializar_matricula_paga_disciplina(mpd: MatriculaPagaDisciplina) -> dict:
                    if (historico_obj and hasattr(historico_obj, 'get_matricula_aluno')) else None
     
     return {
+        'id_mpd': id_mpd,
         'matricula_id': matricula_id,
         'disciplina_id': disciplina_id,
         'historico_id': historico_id,
         'notas': mpd.get_notas(),      
         'faltas': mpd.get_faltas(),
         'media_final': mpd.get_media_final(),
+        'nota_final': mpd.get_nota_final()
     }
 
 def serializar_pessoa(pessoa: Pessoa) -> dict:
@@ -158,80 +160,3 @@ def serializar_professor(professor: Professor) -> dict:
     dados['disciplinas_codigos'] = codigos_disciplinas
     
     return dados
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-def serializar_pessoa(pessoa: 'Pessoa') -> dict:
-    """Converte atributos da classe Pessoa em um dicionário."""
-    # A verificação de tipo é crucial para evitar erros.
-    if not hasattr(pessoa, 'get_data_nascimento'): 
-        raise TypeError("Objeto não é uma Pessoa ou subclasse válida.")
-        
-    data_nascimento_str = pessoa.get_data_nascimento().isoformat()
-    
-    return {
-        'nome': pessoa.get_nome(),
-        'email': pessoa.get_email(),
-        'data_nascimento': data_nascimento_str,
-        'telefone': pessoa.get_telefone(),
-        'endereco': pessoa.get_endereco()
-    }
-
-def serializar_professor(professor: Professor) -> dict:
-    """Converte o objeto Professor para um dicionário JSON."""
-    
-    # 1. Pega os dados básicos chamando a função serializar_pessoa
-    dados = serializar_pessoa(professor) 
-    
-    # 2. Adiciona os atributos específicos do Professor
-    dados['codigo'] = professor.get_codigo()
-    dados['departamento'] = professor.get_departamento()
-    dados['email_institucional'] = professor.get_email_institucional()
-    dados['titulo'] = professor.get_titulo()
-    
-    # 3. Serializa as Associações (Disciplina -> Lista de códigos)
-    codigos_disciplinas = []
-    for disciplina in professor.get_disciplinas():
-        if hasattr(disciplina, 'get_codigo'):
-            codigos_disciplinas.append(disciplina.get_codigo())
-            
-    dados['disciplinas_codigos'] = codigos_disciplinas
-    
-    return dados
-
-# Crie funções semelhantes para Aluno, Disciplina, etc.

@@ -41,18 +41,18 @@ def desserializar_professor(dados: dict) -> Professor:
     )
 
     # ainda sem disciplinas
-    prof.disciplinas = []
-    prof._disciplinas_codigos = dados.get("disciplinas_codigos", [])
+    if not hasattr(prof, "disciplinas"):
+        prof.disciplinas = []
+    prof.__disciplinas_codigos = dados.get("disciplinas_codigos", [])
 
     return prof
-
 
 def desserializar_curso(dados: dict) -> Curso:
 
     curso = Curso(
         codigo=dados["codigo"],
         periodo=dados["periodo"],
-        turno=dados["turno"],
+       turno=dados["turno"],
         avaliacao_curso=dados["avaliacao_curso"],
         disciplinas=[]  # ligamos depois
     )
@@ -111,7 +111,8 @@ def desserializar_historico(dados: dict) -> HistoricoAcademico:
     hist.quantidade_creditos = dados.get("quantidade_creditos", 0)
     hist.lista_atividades_complementares = dados.get(
         "lista_atividades_complementares", [])
-
+    
+    hist._matricula_aluno_id = dados.get("matricula_aluno_id", None)
     hist._registros_json = dados.get("registros_disciplinas", [])
 
     return hist
@@ -143,10 +144,12 @@ def desserializar_mpd(dados: dict) -> MatriculaPagaDisciplina:
     )
 
     mpd.media_final = dados["media_final"]
+    mpd.__nota_final = dados.get("nota_final", None)
 
     mpd._mat_id = dados["matricula_id"]
     mpd._disc_id = dados["disciplina_id"]
     mpd._hist_id = dados["historico_id"]
+    mpd._id_mpd = dados["id_mpd"] #id temporario para o uso de carregamento?
 
     return mpd
 
@@ -188,6 +191,7 @@ def ligar_objetos(alunos, cursos, disciplinas, professores, matriculas, historic
             if cod in disciplinas:
                 lista.append(disciplinas[cod])
         prof.disciplinas = lista
+
 
     # ligar histórico → matricula
     for hist in historicos.values():
