@@ -1,0 +1,16 @@
+{
+    "alunos": [
+        {
+            "matricula": "2024001",
+            "nome": "Maria Silva",
+            "notas": {
+                "Programacao I": 9.5
+            }
+        },
+        {
+            "matricula": "2024002",
+            "nome": "Jo\u00e3o Pereira",
+            "notas": {}
+        }
+    ]
+}
