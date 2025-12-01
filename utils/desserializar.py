@@ -1,229 +1,119 @@
 # utils/desserializar.py
-# versão iniciante, simples e 100% compatível com o projeto
-
 from models.aluno import Aluno
+from models.professor import Professor
 from models.curso import Curso
 from models.disciplina import Disciplina
-from models.professor import Professor
-from models.pessoa import Pessoa
 from models.matricula import Matricula
-from models.matriculapagadisciplina import MatriculaPagaDisciplina
 from models.historicoacademico import HistoricoAcademico
+from models.matriculapagadisciplina import MatriculaPagaDisciplina
+from models.pessoa import Pessoa
+
 import datetime
 
+# ============================================================
+# FUNÇÕES DE DESSERIALIZAÇÃO SIMPLES
+# ============================================================
 
-
-def desserializar_pessoa(dados: dict) -> Pessoa:
-    data = datetime.date.fromisoformat(dados["data_nascimento"])
-    pessoa = Pessoa(
-        nome=dados["nome"],
-        email=dados["email"],
-        data_nascimento=data,
-        telefone=dados["telefone"],
-        endereco=dados["endereco"]
+def desserializar_pessoa(d: dict) -> Pessoa:
+    p = Pessoa(
+        d["nome"],
+        d["email"],
+        datetime.date.fromisoformat(d["data_nascimento"]),
+        d["telefone"],
+        d["endereco"]
     )
-    return pessoa
+    return p
 
 
-def desserializar_professor(dados: dict) -> Professor:
-    pessoa = desserializar_pessoa(dados)
-
-    prof = Professor(
-        nome=pessoa.get_nome(),
-        email=pessoa.get_email(),
-        data_nascimento=pessoa.get_data_nascimento(),
-        telefone=pessoa.get_telefone(),
-        endereco=pessoa.get_endereco(),
-        codigo=dados["codigo"],
-        departamento=dados["departamento"],
-        email_institucional=dados["email_institucional"],
-        titulo=dados["titulo"]
-    )
-
-    # ainda sem disciplinas
-    if not hasattr(prof, "disciplinas"):
-        prof.disciplinas = []
-    prof.__disciplinas_codigos = dados.get("disciplinas_codigos", [])
-
-    return prof
-
-def desserializar_curso(dados: dict) -> Curso:
-
-    curso = Curso(
-        codigo=dados["codigo"],
-        periodo=dados["periodo"],
-       turno=dados["turno"],
-        avaliacao_curso=dados["avaliacao_curso"],
-        disciplinas=[]  # ligamos depois
-    )
-
-    curso._disciplinas_codigos = dados.get("disciplinas_codigos", [])
-
-    return curso
-
-
-def desserializar_disciplina(dados: dict) -> Disciplina:
-
-    disc = Disciplina(
-        codigo=dados["codigo"],
-        nome=dados["nome"],
-        periodo=dados["periodo"],
-        professor_responsavel=None,  # liga depois
-        alunos=[]
-    )
-
-    disc._prof_id = dados.get("professor_responsavel_id", None)
-    disc._alunos_matriculas = dados.get("alunos_matriculas", [])
-
-    return disc
-
-
-def desserializar_aluno(dados: dict) -> Aluno:
-    pessoa = desserializar_pessoa(dados)
-
+def desserializar_aluno(d: dict) -> Aluno:
+    p = desserializar_pessoa(d)
     aluno = Aluno(
-        nome=pessoa.get_nome(),
-        email=pessoa.get_email(),
-        data_nascimento=pessoa.get_data_nascimento(),
-        telefone=pessoa.get_telefone(),
-        endereco=pessoa.get_endereco(),
-        matricula=dados["matricula"],
-        periodo_atual=dados["periodo_atual"],
-        email_institucional=dados["email_institucional"],
-        curso=None,
-        creditos_concluidos=dados["creditos_concluidos"]
+        p.get_nome(), p.get_email(), p.get_data_nascimento(),
+        p.get_telefone(), p.get_endereco(),
+        d["matricula"], d["periodo_atual"],
+        d["email_institucional"], d["creditos_concluidos"]
     )
 
-    aluno._curso_codigo = dados.get("curso_codigo", None)
-
+    aluno._curso_codigo_temp = d["curso_codigo"]
     return aluno
 
 
-def desserializar_historico(dados: dict) -> HistoricoAcademico:
+def desserializar_professor(d: dict) -> Professor:
+    p = desserializar_pessoa(d)
+    prof = Professor(
+        p.get_nome(), p.get_email(), p.get_data_nascimento(),
+        p.get_telefone(), p.get_endereco(),
+        d["codigo"], d["departamento"],
+        d["email_institucional"], d["titulo"]
+    )
+    prof._disciplinas_temp = d.get("disciplinas_codigos", [])
+    return prof
 
-    data = datetime.date.fromisoformat(dados["data_emissao"])
 
-    hist = HistoricoAcademico(
-        matricula_aluno=None,  # liga depois
-        data_emissao=data
+def desserializar_curso(d: dict) -> Curso:
+    c = Curso(d["codigo"], d["periodo"], d["turno"], d["avaliacao_curso"])
+    c._disciplinas_temp = d.get("disciplinas_codigos", [])
+    return c
+
+
+def desserializar_disciplina(d: dict) -> Disciplina:
+    disc = Disciplina(d["codigo"], d["nome"], d["periodo"])
+    disc._prof_temp = d.get("professor_responsavel_id")
+    disc._alunos_temp = d.get("alunos_matriculas", [])
+    return disc
+
+
+def desserializar_historico(d: dict) -> HistoricoAcademico:
+    h = HistoricoAcademico(
+        matricula_aluno=None,
+        quantidade_creditos=d["quantidade_creditos"],
+        atividades=d["lista_atividades_complementares"]
     )
 
-    hist.quantidade_creditos = dados.get("quantidade_creditos", 0)
-    hist.lista_atividades_complementares = dados.get(
-        "lista_atividades_complementares", [])
-    
-    hist._matricula_aluno_id = dados.get("matricula_aluno_id", None)
-    hist._registros_json = dados.get("registros_disciplinas", [])
-
-    return hist
+    h._matricula_temp = d["matricula_aluno_id"]
+    h._registros_temp = d.get("registros_disciplinas", [])
+    h._data_temp = d["data_emissao"]
+    return h
 
 
-def desserializar_matricula(dados: dict) -> Matricula:
-
-    mat = Matricula(
-        id_matricula=dados["id_matricula"],
-        aluno=None,  # liga depois
-        historico_academico=None,  # liga depois
-        status=dados["status"],
-        registros_disciplinas=[]
+def desserializar_matricula(d: dict) -> Matricula:
+    m = Matricula(
+        id_matricula=d["id_matricula"],
+        aluno=None,
+        status=d["status"]
     )
 
-    mat._aluno_matricula_id = dados.get("aluno_matricula_id")
-    mat._historico_id = dados.get("historico_academico_id")
-    mat._registros_json = dados.get("registros_disciplinas", [])
+    m._aluno_temp = d["aluno_matricula_id"]
+    m._historico_temp = d["historico_academico_id"]
+    m._registros_temp = d.get("registros_disciplinas", [])
+    return m
 
-    return mat
 
-
-def desserializar_mpd(dados: dict) -> MatriculaPagaDisciplina:
+def desserializar_mpd(d: dict) -> MatriculaPagaDisciplina:
     mpd = MatriculaPagaDisciplina(
         matricula=None,
         disciplina=None,
-        notas=dados["notas"],
-        faltas=dados["faltas"]
+        historico=None
     )
 
-    mpd.media_final = dados["media_final"]
-    mpd.__nota_final = dados.get("nota_final", None)
+    mpd._id_mpd = d["id_mpd"]
+    mpd._matricula_temp = d["matricula_id"]
+    mpd._disciplina_temp = d["disciplina_id"]
+    mpd._historico_temp = d["historico_id"]
 
-    mpd._mat_id = dados["matricula_id"]
-    mpd._disc_id = dados["disciplina_id"]
-    mpd._hist_id = dados["historico_id"]
-    mpd._id_mpd = dados["id_mpd"] #id temporario para o uso de carregamento?
-
+    mpd._notas_temp = d["notas"]
+    mpd._faltas_temp = d["faltas"]
+    mpd._media_temp = d["media_final"]
+    mpd._nota_final_temp = d["nota_final"]
     return mpd
 
 
-def ligar_objetos(alunos, cursos, disciplinas, professores, matriculas, historicos, mpds):
-
-    # ligar aluno → curso
-    for aluno in alunos.values():
-        cod = aluno._curso_codigo
-        if cod in cursos:
-            aluno.set_curso(cursos[cod])
-
-    # ligar curso → disciplinas
-    for curso in cursos.values():
-        lista = []
-        for cod in curso._disciplinas_codigos:
-            if cod in disciplinas:
-                lista.append(disciplinas[cod])
-        curso.disciplinas = lista
-
-    # ligar disciplina → professor + alunos
-    for disc in disciplinas.values():
-
-        # professor
-        if disc._prof_id in professores:
-            disc.professor_responsavel = professores[disc._prof_id]
-
-        # alunos matriculados
-        alunos_lista = []
-        for mat in disc._alunos_matriculas:
-            if mat in alunos:
-                alunos_lista.append(alunos[mat])
-        disc.alunos = alunos_lista
-
-    # ligar professor → disciplinas
-    for prof in professores.values():
-        lista = []
-        for cod in prof._disciplinas_codigos:
-            if cod in disciplinas:
-                lista.append(disciplinas[cod])
-        prof.disciplinas = lista
-
-
-    # ligar histórico → matricula
-    for hist in historicos.values():
-        for mat_id, mat in matriculas.items():
-            if mat_id == hist.get_matricula_aluno_id():
-                hist.matricula_aluno = mat
-
-    # ligar matricula → aluno e histórico
-    for mat in matriculas.values():
-        if mat._aluno_matricula_id in alunos:
-            mat.aluno = alunos[mat._aluno_matricula_id]
-        if mat._historico_id in historicos:
-            mat.historico_academico = historicos[mat._historico_id]
-
-    # ligar MPDs
-    for mpd in mpds.values():
-        if mpd._mat_id in matriculas:
-            mpd.matricula = matriculas[mpd._mat_id]
-        if mpd._disc_id in disciplinas:
-            mpd.disciplina = disciplinas[mpd._disc_id]
-
-#  FUNÇÃO FINAL – CARREGA TUDO A PARTIR DO JSON
-
-def carregar_tudo(
-        alunos_json,
-        cursos_json,
-        disciplinas_json,
-        professores_json,
-        matriculas_json,
-        historicos_json,
-        mpds_json
-):
+# ============================================================
+# FUNÇÃO QUE RECONSTRÓI TODA A REDE DE OBJETOS
+# ============================================================
+def carregar_tudo(alunos_json, cursos_json, disciplinas_json,
+                  professores_json, matriculas_json,
+                  historicos_json, mpds_json):
 
     alunos = {}
     cursos = {}
@@ -233,37 +123,71 @@ def carregar_tudo(
     historicos = {}
     mpds = {}
 
-    # criar objetos sem ligação
+    # 1 — Criar objetos simples (sem ligações)
+    for d in alunos_json:
+        obj = desserializar_aluno(d)
+        alunos[obj.get_matricula()] = obj
+
     for d in cursos_json:
-        c = desserializar_curso(d)
-        cursos[c.get_codigo()] = c
+        obj = desserializar_curso(d)
+        cursos[obj.get_codigo()] = obj
 
     for d in disciplinas_json:
-        disc = desserializar_disciplina(d)
-        disciplinas[disc.get_codigo()] = disc
+        obj = desserializar_disciplina(d)
+        disciplinas[obj.get_codigo()] = obj
 
     for d in professores_json:
-        p = desserializar_professor(d)
-        professores[p.get_codigo()] = p
-
-    for d in alunos_json:
-        a = desserializar_aluno(d)
-        alunos[a.get_matricula()] = a
-
-    for d in historicos_json:
-        h = desserializar_historico(d)
-        historicos[h.get_id()] = h
+        obj = desserializar_professor(d)
+        professores[obj.get_codigo()] = obj
 
     for d in matriculas_json:
-        m = desserializar_matricula(d)
-        matriculas[m.get_id_matricula()] = m
+        obj = desserializar_matricula(d)
+        matriculas[obj.get_id_matricula()] = obj
+
+    for d in historicos_json:
+        obj = desserializar_historico(d)
+        historicos[d["matricula_aluno_id"]] = obj
 
     for d in mpds_json:
         obj = desserializar_mpd(d)
-        mpds[id(obj)] = obj  # MPDs não têm ID próprio
+        mpds[d["id_mpd"]] = obj  # ID estável OK!
 
-    # agora ligar tudo
-    ligar_objetos(alunos, cursos, disciplinas, professores,
-                  matriculas, historicos, mpds)
+
+    # 2 — Ligar objetos
+    for aluno in alunos.values():
+        if aluno._curso_codigo_temp:
+            aluno.set_curso(cursos.get(aluno._curso_codigo_temp))
+
+    for curso in cursos.values():
+        curso._disciplinas = [
+            disciplinas[codigo] for codigo in curso._disciplinas_temp
+            if codigo in disciplinas
+        ]
+
+    for disciplina in disciplinas.values():
+        if disciplina._prof_temp:
+            disciplina.set_professor_responsavel(professores.get(disciplina._prof_temp))
+
+        disciplina._alunos = [
+            alunos[m] for m in disciplina._alunos_temp if m in alunos
+        ]
+
+    for historico in historicos.values():
+        historico._matricula_aluno = alunos.get(historico._matricula_temp)
+        historico._data_emissao = datetime.datetime.fromisoformat(historico._data_temp)
+
+    for matricula in matriculas.values():
+        matricula._aluno = alunos.get(matricula._aluno_temp)
+        matricula._historico = historicos.get(matricula._historico_temp)
+
+    for mpd in mpds.values():
+        mpd._matricula = matriculas.get(mpd._matricula_temp)
+        mpd._disciplina = disciplinas.get(mpd._disciplina_temp)
+        mpd._historico_acad = historicos.get(mpd._historico_temp)
+
+        mpd._notas = mpd._notas_temp
+        mpd._faltas = mpd._faltas_temp
+        mpd._media_final = mpd._media_temp
+        mpd._nota_final = mpd._nota_final_temp
 
     return alunos, cursos, disciplinas, professores, matriculas, historicos, mpds
