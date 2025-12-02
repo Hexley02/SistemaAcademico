@@ -1,15 +1,16 @@
 import datetime
 from pessoa import Pessoa
 from disciplina import Disciplina
+from typing import List
 
 
 class Professor(Pessoa):
     def __init__(self, nome:str, email:str, data_nascimento:datetime.date, telefone:str, endereco:str,
-                 codigo:int, departamento:str, disciplinas:Disciplina, email_institucional:str, titulo:str):
+                 codigo:int, departamento:str, disciplinas: List[Disciplina] = None, email_institucional:str, titulo:str):
         super().__init__(nome, email, data_nascimento, telefone, endereco)
         self.__codigo = codigo
         self.__departamento = departamento
-        self.__disciplinas = disciplinas
+        self.__disciplinas = disciplinas if disciplinas is not None else []
         self.__email_institucional = email_institucional
         self.__titulo = titulo
 
@@ -43,7 +44,6 @@ class Professor(Pessoa):
         if not self.__disciplinas:
             disciplina_nome = "Nenhuma"
         else:
-            # Se for um iterável (lista/tupla) e não uma string, junta os nomes
             if hasattr(self.__disciplinas, '__iter__') and not isinstance(self.__disciplinas, (str, bytes)):
                 nomes = []
                 for d in self.__disciplinas:
@@ -66,7 +66,6 @@ class Professor(Pessoa):
         )
         return detalhes_pessoa + detalhes_professor
     
-    #nos dois recebe o objeto de disciplina
     def alocar_disciplinas(self, disciplina: Disciplina):
 
         try:
@@ -76,7 +75,7 @@ class Professor(Pessoa):
         except AttributeError:
             raise TypeError("Erro: O objeto fornecido não é uma Disciplina válida (falta get_codigo()).")
 
-       
+        
         if disciplina in self.__disciplinas:
             raise ValueError(f"A Disciplina '{disc_nome}' (Código {disc_codigo}) já está alocada a este professor.")
         
@@ -93,11 +92,8 @@ class Professor(Pessoa):
         except AttributeError:
             raise TypeError("Erro: O objeto fornecido não é uma Disciplina válida (falta get_codigo()).")
         
-        if disciplina not in self.__disciplinas:
+        if disciplina in self.__disciplinas:
             self.__disciplinas.remove(disciplina)
             print(f"Disciplina '{disc_nome}' removida do Professor {self.__nome} com sucesso.")
         else:
             raise ValueError(f"A Disciplina '{disc_nome}' (Código {disc_codigo}) não está alocada a este professor.")
-       
-
-    

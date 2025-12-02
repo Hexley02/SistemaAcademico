@@ -3,10 +3,10 @@ from professor import Professor
 from typing import List
 
 class Disciplina:
-    def __init__(self, codigo:int, período:int, nome:str, professor_responsavel: "Professor", alunos:List[Aluno]):
+    def __init__(self, codigo:int, periodo:int, nome:str, professor_responsavel: "Professor", alunos:List[Aluno]):
         self.__codigo = codigo
         self.__nome = nome
-        self.__período = período
+        self.__periodo = periodo
         self.__professor_responsavel = professor_responsavel
         self.__alunos = alunos if alunos is not None else []
 
@@ -18,7 +18,7 @@ class Disciplina:
         return self.__nome
     
     def get_período(self):
-        return self.__período
+        return self.__periodo
     
     def get_professor_responsavel(self):
         return self.__professor_responsavel
@@ -33,8 +33,8 @@ class Disciplina:
     def set_professor_responsavel(self, professor):
         self.__professor_responsavel = professor
 
-    def set_periodo(self, período:int):
-        self.__período = período
+    def set_periodo(self, periodo:int):
+        self.__periodo = periodo
 
         
 #metódos
@@ -51,7 +51,7 @@ class Disciplina:
         detalhes = (
             f"Código: {self.__codigo}\n"
             f"Nome: {self.__nome}\n"
-            f"Período: {self.__período}\n"
+            f"Periodo: {self.__periodo}\n"
             f"Professor responsável: {professor}\n"
             f"Alunos: {nomes_alunos}"
         )
